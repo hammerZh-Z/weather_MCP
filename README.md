@@ -19,7 +19,7 @@ pip install httpx>=0.27.0 pydantic>=2.6.0 mcp>=0.1.0
 uv sync
 ```
 
-## 启动服务（SSE）
+## 启动服务
 
 直接运行：
 
@@ -33,7 +33,7 @@ python weather.py
 py weather.py
 ```
 
-该脚本会以 **SSE 传输**启动 MCP Server（FastMCP 默认监听 `127.0.0.1:8000`，SSE 路径为 `/sse`）。
+该脚本会以 **STDIO 传输**启动 MCP Server，可以通过标准输入输出进行通信。
 
 ## 工具列表
 
@@ -96,7 +96,7 @@ py weather.py
 
 ## MCP 服务配置
 
-本服务支持 **SSE (Server-Sent Events)** 传输方式，可以远程托管部署。
+本服务使用 **STDIO (标准输入输出)** 传输方式。
 
 ### 快速启动配置
 
@@ -132,11 +132,9 @@ py weather.py
 
 ### 配置说明
 
-- **传输方式**：SSE (Server-Sent Events)
-- **默认监听地址**：`127.0.0.1:8000`
-- **SSE 路径**：`/sse`
+- **传输方式**：STDIO (标准输入输出)
 - **环境变量**：无需额外环境变量配置
-- **托管类型**：可托管部署（不依赖本地资源）
+- **托管类型**：仅本地可用（STDIO 方式需要本地运行）
 - **网络要求**：需要能访问 Open-Meteo API (`api.open-meteo.com` 和 `geocoding-api.open-meteo.com`)
 
 ### Claude Desktop 配置示例
@@ -147,8 +145,21 @@ py weather.py
 {
   "mcpServers": {
     "weather": {
-        "type": "sse",
-        "url": "http://127.0.0.1:8000/sse"
+      "command": "python",
+      "args": ["F:\\python学习资料\\3mcp\\first_own\\npx_weather\\weather.py"]
+    }
+  }
+}
+```
+
+或者在 macOS/Linux 上使用绝对路径：
+
+```json
+{
+  "mcpServers": {
+    "weather": {
+      "command": "python",
+      "args": ["/path/to/npx_weather/weather.py"]
     }
   }
 }
@@ -159,4 +170,4 @@ py weather.py
 - 预报范围：Open-Meteo 日级预报限制为 `0-16` 天。
 - 城市解析：先通过 Open-Meteo Geocoding 获取经纬度，再拉取预报（需要可访问外网）。
 - 错误返回：出错时返回以 `Error:` 开头的字符串（例如城市不存在、参数校验失败、请求超时/限流等）。
-- 托管部署：本服务不依赖本地资源，适合在 ModelScope 平台进行远程托管部署。
+- 传输方式：使用 STDIO 传输，需要在本地运行，适合集成到 MCP 客户端（如 Claude Desktop）。

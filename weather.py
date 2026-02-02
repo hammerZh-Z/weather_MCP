@@ -445,4 +445,4 @@ async def weather_query_by_weekday(params: WeekdayQueryInput) -> str:
         return _handle_api_error(e)
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="stdio")
