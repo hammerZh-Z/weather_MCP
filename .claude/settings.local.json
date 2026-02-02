@@ -6,7 +6,11 @@
       "Bash(git rebase:*)",
       "Bash(git push:*)",
       "WebSearch",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(pip install build:*)",
+      "Bash(python -m build:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uv run python:*)"
     ],
     "deny": [],
     "ask": []

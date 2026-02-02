@@ -1,39 +1,47 @@
-# npx-weather
+# Weather MCP
 
-一个基于 Open-Meteo 的 MCP 天气服务：提供“按天数”和“按星期几”两种查询方式，返回 Markdown（默认）或 JSON。
+一个基于 Open-Meteo 的 MCP 天气服务：提供"按天数"和"按星期几"两种查询方式，返回 Markdown（默认）或 JSON。
 
 ## 环境要求
 
 - Python：3.13+
 - 依赖：`httpx`、`pydantic`、`mcp`（见 `pyproject.toml`）
 
-安装（pip 示例）：
+## 快速开始
+
+### 方式 1：使用 uvx 直接运行（推荐）
+
+无需安装，直接运行：
 
 ```bash
-pip install httpx>=0.27.0 pydantic>=2.6.0 mcp>=0.1.0
+uvx weather-mcp
 ```
 
-如果你使用 `uv`：
+### 方式 2：从 PyPI 安装
+
+```bash
+pip install weather-mcp
+```
+
+然后运行：
+
+```bash
+weather-mcp
+```
+
+### 方式 3：本地开发
+
+安装依赖（如果你使用 `uv`）：
 
 ```bash
 uv sync
 ```
 
-## 启动服务
-
-直接运行：
+或使用 pip：
 
 ```bash
-python weather.py
+pip install httpx>=0.27.0 pydantic>=2.6.0 mcp>=0.1.0
 ```
-
-在 Windows 上如果没有 `python` 命令，也可以用：
-
-```bash
-py weather.py
-```
-
-该脚本会以 **STDIO 传输**启动 MCP Server，可以通过标准输入输出进行通信。
 
 ## 工具列表
 
@@ -100,31 +108,33 @@ py weather.py
 
 ### 快速启动配置
 
-**方式 1：使用 Python 直接运行**
+**方式 1：使用 weather-mcp 命令（推荐）**
+
+如果已通过 pip 或 uvx 安装：
+
+```json
+{
+  "command": "weather-mcp",
+  "args": [],
+  "env": {}
+}
+```
+
+**方式 2：使用 uvx 直接运行**
+
+```json
+{
+  "command": "uvx",
+  "args": ["weather-mcp"],
+  "env": {}
+}
+```
+
+**方式 3：使用 Python 直接运行**
 
 ```json
 {
   "command": "python",
-  "args": ["weather.py"],
-  "env": {}
-}
-```
-
-**方式 2：使用 uv 运行（推荐）**
-
-```json
-{
-  "command": "uv",
-  "args": ["--directory", "/path/to/npx_weather", "run", "python", "weather.py"],
-  "env": {}
-}
-```
-
-**方式 3：使用 Windows 的 py 命令**
-
-```json
-{
-  "command": "py",
   "args": ["weather.py"],
   "env": {}
 }
@@ -145,21 +155,20 @@ py weather.py
 {
   "mcpServers": {
     "weather": {
-      "command": "python",
-      "args": ["F:\\python学习资料\\3mcp\\first_own\\npx_weather\\weather.py"]
+      "command": "weather-mcp"
     }
   }
 }
 ```
 
-或者在 macOS/Linux 上使用绝对路径：
+或者使用 uvx：
 
 ```json
 {
   "mcpServers": {
     "weather": {
-      "command": "python",
-      "args": ["/path/to/npx_weather/weather.py"]
+      "command": "uvx",
+      "args": ["weather-mcp"]
     }
   }
 }

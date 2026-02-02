@@ -444,5 +444,9 @@ async def weather_query_by_weekday(params: WeekdayQueryInput) -> str:
     except Exception as e:
         return _handle_api_error(e)
 
-if __name__ == "__main__":
+def main():
+    """Entry point for the weather-mcp command."""
     mcp.run(transport="stdio")
+
+if __name__ == "__main__":
+    main()
