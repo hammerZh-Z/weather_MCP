@@ -94,8 +94,71 @@ py weather.py
 - 顶层：`city`、`country`、`date`、`latitude`、`longitude`
 - `weather`：包含 Open-Meteo `daily` 下的各字段在目标日期对应的值（例如 `weathercode`、`temperature_2m_max`、`precipitation_sum`、`sunrise`、`sunset` 等）
 
+## MCP 服务配置
+
+本服务支持 **SSE (Server-Sent Events)** 传输方式，可以远程托管部署。
+
+### 快速启动配置
+
+**方式 1：使用 Python 直接运行**
+
+```json
+{
+  "command": "python",
+  "args": ["weather.py"],
+  "env": {}
+}
+```
+
+**方式 2：使用 uv 运行（推荐）**
+
+```json
+{
+  "command": "uv",
+  "args": ["--directory", "/path/to/npx_weather", "run", "python", "weather.py"],
+  "env": {}
+}
+```
+
+**方式 3：使用 Windows 的 py 命令**
+
+```json
+{
+  "command": "py",
+  "args": ["weather.py"],
+  "env": {}
+}
+```
+
+### 配置说明
+
+- **传输方式**：SSE (Server-Sent Events)
+- **默认监听地址**：`127.0.0.1:8000`
+- **SSE 路径**：`/sse`
+- **环境变量**：无需额外环境变量配置
+- **托管类型**：可托管部署（不依赖本地资源）
+- **网络要求**：需要能访问 Open-Meteo API (`api.open-meteo.com` 和 `geocoding-api.open-meteo.com`)
+
+### Claude Desktop 配置示例
+
+在 Claude Desktop 的配置文件中添加：
+
+```json
+{
+  "mcpServers": {
+    "weather": {
+      "transport": {
+        "type": "sse",
+        "url": "http://127.0.0.1:8000/sse"
+      }
+    }
+  }
+}
+```
+
 ## 备注与限制
 
 - 预报范围：Open-Meteo 日级预报限制为 `0-16` 天。
 - 城市解析：先通过 Open-Meteo Geocoding 获取经纬度，再拉取预报（需要可访问外网）。
 - 错误返回：出错时返回以 `Error:` 开头的字符串（例如城市不存在、参数校验失败、请求超时/限流等）。
+- 托管部署：本服务不依赖本地资源，适合在 ModelScope 平台进行远程托管部署。
