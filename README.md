@@ -147,10 +147,8 @@ py weather.py
 {
   "mcpServers": {
     "weather": {
-      "transport": {
         "type": "sse",
         "url": "http://127.0.0.1:8000/sse"
-      }
     }
   }
 }
