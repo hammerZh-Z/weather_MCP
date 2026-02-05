@@ -10,7 +10,17 @@
       "Bash(pip install build:*)",
       "Bash(python -m build:*)",
       "Bash(uv pip install:*)",
-      "Bash(uv run python:*)"
+      "Bash(uv run python:*)",
+      "Bash(set:*)",
+      "Bash(uv run twine upload:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(npx -y @modelcontextprotocol/inspector python:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(timeout:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

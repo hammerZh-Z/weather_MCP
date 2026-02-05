@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MCP：船坞 ↔ 拓展坞关系图</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a2e;
+      --ink:#e7eefc;
+      --muted:#9fb0d0;
+      --line:#2a3a5e;
+      --accent:#6aa7ff;
+      --accent2:#8bffcc;
+      --warn:#ffcc66;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC","Noto Sans CJK SC","Microsoft YaHei", sans-serif;
+      background: radial-gradient(1200px 700px at 20% 0%, #152548 0%, var(--bg) 55%) fixed;
+      color:var(--ink);
+      line-height:1.5;
+    }
+    header{
+      padding:28px 18px 12px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:28px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      color:var(--muted);
+      margin:0;
+      font-size:14px;
+    }
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 18px 34px;
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 920px){
+      main{grid-template-columns:1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      padding:16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:16px;
+      color:var(--ink);
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .pill{
+      font-size:12px;
+      padding:3px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.16);
+      color:var(--muted);
+      background: rgba(255,255,255,.04);
+      white-space:nowrap;
+    }
+    ul{margin:10px 0 0 18px; color:var(--muted)}
+    li{margin:6px 0}
+    .kv{
+      display:grid;
+      grid-template-columns: 120px 1fr;
+      gap:8px 10px;
+      margin-top:10px;
+      font-size:13px;
+    }
+    .k{color:var(--muted)}
+    .v{color:var(--ink)}
+    code{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 1px 6px;
+      border-radius: 6px;
+      color: #d8e6ff;
+    }
+    .small{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+    .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      display:inline-block;margin-right:6px; vertical-align:middle;
+    }
+    .dot.a{background:var(--accent)}
+    .dot.b{background:var(--accent2)}
+    .dot.c{background:var(--warn)}
+    .btnrow{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      color:var(--ink);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    button:hover{background: rgba(255,255,255,.10)}
+    button:active{transform: translateY(1px)}
+    .note{
+      border-left: 3px solid var(--accent);
+      padding: 10px 12px;
+      background: rgba(106,167,255,.10);
+      border-radius: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;}
+  </style>
+</head>
+
+<body>
+<header>
+  <h1>MCP：用“船坞 ↔ 拓展坞”把工具生态讲明白</h1>
+  <p class="sub">把 MCP 想成一套“标准靠泊 + 补给”的规矩：这艘船（LLM/Agent）到哪个港口（工具/服务），都能安全、可控地接上能力。</p>
+</header>
+
+<main>
+  <!-- Diagram -->
+  <section class="card">
+    <h2>
+      关系图（可交互）
+      <span class="pill">SVG / 无外部依赖</span>
+    </h2>
+
+    <svg id="diagram" viewBox="0 0 1050 560" width="100%" height="auto" role="img" aria-label="MCP 船坞与拓展坞关系图">
+      <!-- defs -->
+      <defs>
+        <linearGradient id="gCard" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="rgba(255,255,255,0.08)"/>
+          <stop offset="1" stop-color="rgba(255,255,255,0.03)"/>
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="rgba(0,0,0,.35)"/>
+        </filter>
+        <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
+          <path d="M0,0 L14,7 L0,14 z" fill="rgba(106,167,255,.95)"></path>
+        </marker>
+        <marker id="arrow2" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
+          <path d="M0,0 L14,7 L0,14 z" fill="rgba(139,255,204,.95)"></path>
+        </marker>
+      </defs>
+
+      <!-- background frame -->
+      <rect x="20" y="20" width="1010" height="520" rx="22" fill="url(#gCard)" stroke="rgba(255,255,255,.10)" filter="url(#shadow)"/>
+
+      <!-- Left: Shipyard -->
+      <g id="shipyard" class="node" tabindex="0" aria-label="船坞：工具与服务生产/维护区">
+        <rect x="70" y="90" width="380" height="360" rx="18" fill="rgba(106,167,255,.10)" stroke="rgba(106,167,255,.45)"/>
+        <text x="110" y="140" fill="#e7eefc" font-size="26" font-weight="700">船坞 Shipyard</text>
+        <text x="110" y="172" fill="#9fb0d0" font-size="14">工具/服务的“制造、维护、上架”区域</text>
+
+        <!-- bullets -->
+        <g fill="#9fb0d0" font-size="14">
+          <text x="110" y="220">• 工具实现：天气、搜索、数据库、代码执行…</text>
+          <text x="110" y="250">• 权限边界：认证、配额、审计、隔离</text>
+          <text x="110" y="280">• 发布形态：本地进程 / HTTP 服务 / 远端平台</text>
+          <text x="110" y="310">• 可替换：同名工具可由不同供应方实现</text>
+        </g>
+
+        <!-- icons: tool crates -->
+        <g>
+          <rect x="120" y="350" width="90" height="70" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.10)"/>
+          <text x="145" y="392" fill="#d8e6ff" font-size="14" class="mono">tool A</text>
+
+          <rect x="230" y="350" width="90" height="70" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.10)"/>
+          <text x="255" y="392" fill="#d8e6ff" font-size="14" class="mono">tool B</text>
+
+          <rect x="340" y="350" width="90" height="70" rx="12" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.10)"/>
+          <text x="365" y="392" fill="#d8e6ff" font-size="14" class="mono">tool C</text>
+        </g>
+      </g>
+
+      <!-- Center: MCP bridge -->
+      <g id="mcp" class="node" tabindex="0" aria-label="MCP：协议与对接层">
+        <rect x="470" y="200" width="300" height="140" rx="18" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+        <text x="520" y="255" fill="#e7eefc" font-size="28" font-weight="800">MCP</text>
+        <text x="520" y="283" fill="#9fb0d0" font-size="13">Model Context Protocol</text>
+        <text x="520" y="312" fill="#9fb0d0" font-size="13">统一的“对接标准”：发现工具、调用工具、回传结果</text>
+
+        <rect x="485" y="330" width="270" height="34" rx="10" fill="rgba(106,167,255,.12)" stroke="rgba(106,167,255,.35)"/>
+        <text x="500" y="353" fill="#d8e6ff" font-size="13" class="mono">tools/list · tools/call · schema</text>
+      </g>
+
+      <!-- Right: Docking station -->
+      <g id="dock" class="node" tabindex="0" aria-label="拓展坞：LLM/Agent 接入与扩展区">
+        <rect x="800" y="90" width="190" height="360" rx="18" fill="rgba(139,255,204,.10)" stroke="rgba(139,255,204,.45)"/>
+        <text x="825" y="140" fill="#e7eefc" font-size="24" font-weight="700">拓展坞</text>
+        <text x="825" y="168" fill="#9fb0d0" font-size="14">Dock</text>
+
+        <g fill="#9fb0d0" font-size="14">
+          <text x="825" y="220">• LLM/Agent “插上”</text>
+          <text x="825" y="250">• 即可获得新能力</text>
+          <text x="825" y="280">• 不改模型也能扩展</text>
+          <text x="825" y="310">• 统一入口与治理</text>
+        </g>
+
+        <!-- laptop-ish -->
+        <rect x="825" y="340" width="140" height="90" rx="14" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.10)"/>
+        <rect x="840" y="355" width="110" height="45" rx="8" fill="rgba(0,0,0,.25)" stroke="rgba(255,255,255,.08)"/>
+        <text x="845" y="420" fill="#d8e6ff" font-size="13" class="mono">LLM / Agent</text>
+      </g>
+
+      <!-- Links -->
+      <path d="M450 270 C 470 270, 470 270, 470 270" stroke="none" fill="none"/>
+      <line x1="450" y1="270" x2="470" y2="270" stroke="rgba(106,167,255,.75)" stroke-width="3" marker-end="url(#arrow)"/>
+
+      <line x1="770" y1="270" x2="800" y2="270" stroke="rgba(139,255,204,.75)" stroke-width="3" marker-end="url(#arrow2)"/>
+
+      <!-- Caption arrows -->
+      <text x="300" y="70" fill="#9fb0d0" font-size="12">“供给侧”：工具/服务生产与维护</text>
+      <text x="760" y="70" fill="#9fb0d0" font-size="12" text-anchor="end">“需求侧”：LLM 通过协议获取能力</text>
+
+      <!-- call flow -->
+      <g id="flowHint">
+        <text x="525" y="405" fill="#9fb0d0" font-size="12">典型调用链：</text>
+        <text x="525" y="430" fill="#9fb0d0" font-size="12" class="mono">
+          Agent → MCP → tool → result → MCP → Agent
+        </text>
+      </g>
+    </svg>
+
+    <div class="legend">
+      <span><span class="dot a"></span>船坞：工具/服务提供方</span>
+      <span><span class="dot b"></span>拓展坞：LLM/Agent 侧能力扩展</span>
+      <span><span class="dot c"></span>MCP：统一对接标准（协议层）</span>
+    </div>
+
+    <div class="btnrow">
+      <button id="btnShipyard">看船坞</button>
+      <button id="btnMcp">看 MCP</button>
+      <button id="btnDock">看拓展坞</button>
+      <button id="btnReset">清空高亮</button>
+    </div>
+
+    <div class="note" id="note">
+      小提示：把“船坞”当成 <code>工具供给侧</code>，把“拓展坞”当成 <code>给 Agent 插能力的一侧</code>；MCP 做的事就是把“插拔”变成标准动作。
+    </div>
+  </section>
+
+  <!-- Explanation -->
+  <aside class="card">
+    <h2>一句话类比 <span class="pill">讲给非技术同学</span></h2>
+    <p style="margin:0;color:var(--muted);font-size:14px">
+      船坞这边负责把各种工具/服务造出来、修起来；拓展坞这边负责让船一靠岸就能立刻接上电、网和外设（LLM/Agent 也就立刻多了能力）。
+      <br/>而 MCP 就是那套“统一接口 + 统一流程”，让不同的船到不同的港口都能顺利对接。
+    </p>
+
+    <h2 style="margin-top:14px;">映射表 <span class="pill">讲给技术同学</span></h2>
+    <div class="kv">
+      <div class="k">船</div><div class="v">LLM / Agent（本体不够用，需要外援）</div>
+      <div class="k">船坞</div><div class="v">工具/服务提供侧（能力实现 + 治理）</div>
+      <div class="k">拓展坞</div><div class="v">客户端集成侧（把能力挂到 Agent 上）</div>
+      <div class="k">标准接口</div><div class="v">MCP：发现工具、参数 schema、调用/返回协议</div>
+      <div class="k">靠泊流程</div><div class="v">鉴权 → 看有哪些工具 → 调用 → 返回结果 → 留日志/审计</div>
+    </div>
+
+    <h2 style="margin-top:14px;">你可以怎么讲 MCP <span class="pill">3 句话</span></h2>
+    <ul>
+      <li>MCP 不是又一个工具，它更像工具对接的“统一插头”。</li>
+      <li>标准一统一，工具随便升级；模型不用改，也能一直加能力。</li>
+      <li>更关键的是：权限、审计、连接管理这些工程活，都能用一套方式管起来。</li>
+    </ul>
+
+    <p class="small">
+      如果你前面聊过 SSE / Streamable HTTP：可以把它理解成“靠泊通道怎么选”，
+      SSE 更像单向广播；Streamable HTTP 更像更标准的双向通道（后续治理和扩展更顺手）。
+    </p>
+  </aside>
+</main>
+
+<script>
+  const shipyard = document.getElementById('shipyard');
+  const mcp = document.getElementById('mcp');
+  const dock = document.getElementById('dock');
+  const note = document.getElementById('note');
+
+  const nodes = [shipyard, mcp, dock];
+
+  function clear(){
+    nodes.forEach(n=>{
+      n.querySelectorAll('rect').forEach(r=>{
+        r.style.strokeWidth = "";
+        r.style.filter = "";
+        r.style.opacity = "";
+      });
+      n.style.opacity = "";
+    });
+  }
+
+  function focus(node, msg){
+    clear();
+    nodes.forEach(n=> n.style.opacity = (n === node ? "1" : "0.55"));
+    node.querySelectorAll('rect').forEach(r=>{
+      r.style.strokeWidth = "3";
+      r.style.filter = "drop-shadow(0 10px 18px rgba(0,0,0,.35))";
+    });
+    note.innerHTML = msg;
+  }
+
+  document.getElementById('btnShipyard').onclick = () => focus(
+    shipyard,
+    '船坞这边（供给侧）主要忙：<code>工具怎么实现</code>、<code>权限/审计怎么做</code>、<code>怎么发布/运维</code>。MCP 让这些工具按统一方式“能被找到、能被调用”。'
+  );
+
+  document.getElementById('btnMcp').onclick = () => focus(
+    mcp,
+    'MCP 就是中间这层统一对接：<code>工具怎么列出来</code>、<code>入参/出参长啥样（schema）</code>、<code>怎么调用/怎么回</code>。标准一统一，工具就能随插随用、也更好管。'
+  );
+
+  document.getElementById('btnDock').onclick = () => focus(
+    dock,
+    '拓展坞这边（需求侧）关心的是：<code>怎么把能力快点挂到 Agent 上</code>。模型本身不用动，通过 MCP 想用哪个工具就挂哪个，能力边界立刻变大。'
+  );
+
+  document.getElementById('btnReset').onclick = () => {
+    clear();
+    nodes.forEach(n=> n.style.opacity = "1");
+    note.innerHTML = '小提示：把“船坞”当成 <code>工具供给侧</code>，把“拓展坞”当成 <code>给 Agent 插能力的一侧</code>；MCP 做的事就是把“插拔”变成标准动作。';
+  };
+
+  // Accessibility: click node to focus
+  shipyard.addEventListener('click', ()=>document.getElementById('btnShipyard').click());
+  mcp.addEventListener('click', ()=>document.getElementById('btnMcp').click());
+  dock.addEventListener('click', ()=>document.getElementById('btnDock').click());
+  nodes.forEach(n=>{
+    n.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        n.click();
+      }
+    });
+  });
+</script>
+</body>
+</html>

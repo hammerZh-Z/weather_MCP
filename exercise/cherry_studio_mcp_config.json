@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "lower_server": {
+      "command": "F:\\python学习资料\\3mcp\\first_own\\npx_weather\\.venv\\Scripts\\python.exe",
+      "args": [
+        "F:\\python学习资料\\3mcp\\first_own\\npx_weather\\exercise\\lower_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}
